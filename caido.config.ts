@@ -4,7 +4,7 @@ export default defineConfig({
   id: "better-websockets",
   name: "Better Websockets",
   description: "Browse, search, filter and export WebSocket streams directly from the Caido sidebar.",
-  version: "1.0.0",
+  version: "1.0.1",
   author: {
     name: "Jakob Pachmann",
     email: "jakob.pachmann@proton.me",
