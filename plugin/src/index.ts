@@ -132,26 +132,24 @@ async function exportStream(
   sdk.window.showToast("Fetching messages…", { variant: "info", duration: 5000 });
   const stream = await fetchWsStream(sdk, meta);
   const n = stream.messages.length;
+  const content = formatWsBundle(stream);
 
   if (action === "copy") {
-    await navigator.clipboard.writeText(formatWsBundle(stream));
+    await navigator.clipboard.writeText(content);
     sdk.window.showToast(
       `Copied ${n} message${n === 1 ? "" : "s"} to clipboard!`,
       { variant: "success" }
     );
   } else {
-    let dirHandle: FileSystemDirectoryHandle;
-    try {
-      dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
-    } catch {
-      return;
-    }
-    const fileHandle = await dirHandle.getFileHandle(makeWsFilename(stream), {
-      create: true,
-    });
-    const writable = await fileHandle.createWritable();
-    await writable.write(formatWsBundle(stream));
-    await writable.close();
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = makeWsFilename(stream);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
     sdk.window.showToast(
       `Saved ${n} message${n === 1 ? "" : "s"} to file!`,
       { variant: "success" }
